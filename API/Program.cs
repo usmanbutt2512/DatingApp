@@ -7,7 +7,6 @@ var builder = WebApplication.CreateBuilder(args);
 SQLitePCL.Batteries_V2.Init();
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -23,6 +22,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors(policy => policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("https://localhost:4200", "http://localhost:4200"));
+
 app.MapControllers();
 
 app.Run();

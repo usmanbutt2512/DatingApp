@@ -30,6 +30,7 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<AppUser>> CreateMember(AppUser user)
         {
+            user.Id = Guid.NewGuid();
             context.AppUsers.Add(user);
             await context.SaveChangesAsync();
 
