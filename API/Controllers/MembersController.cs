@@ -1,20 +1,22 @@
 using API.Data;
+using API.DTOs;
 using API.Entities;
-using Microsoft.AspNetCore.Http;
+using API.Extension;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")] // locahost:5001/api/members
-    [ApiController]
-    public class MembersController(AppDbContext context) : ControllerBase
+    // locahost:5001/api/members    
+    [Authorize]
+    public class MembersController(AppDbContext context) : BaseController
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<AppUser>>> GetMembers()
+        public async Task<ActionResult<IReadOnlyList<UserDto>>> GetMembers()
         {
-            var members = await context.AppUsers.ToListAsync();
-
+            var members = await context.AppUsers.Select(x=>AppUserExtensions.ToDto(x)).ToListAsync();
+            
             return members;
         }
 
