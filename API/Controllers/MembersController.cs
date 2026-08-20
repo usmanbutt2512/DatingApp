@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Controllers
 {
     // locahost:5001/api/members    
-    [Authorize]
+    // [Authorize]
     public class MembersController(AppDbContext context) : BaseController
     {
         [HttpGet]
@@ -21,22 +21,22 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")] // locahost:5001/api/members/bob-id
-        public async Task<ActionResult<AppUser>> GetMember(string id)
+        public async Task<ActionResult<UserDto>> GetMember(string id)
         {
             var member = await context.AppUsers.FindAsync(id);
 
             if (member == null) return NotFound();
 
-            return member;
+            return member.ToDto();
         }
         [HttpPost]
-        public async Task<ActionResult<AppUser>> CreateMember(AppUser user)
+        public async Task<ActionResult<UserDto>> CreateMember(AppUser user)
         {
             user.Id = Guid.NewGuid();
             context.AppUsers.Add(user);
             await context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetMember), new { id = user.Id }, user);
+            return CreatedAtAction(nameof(GetMember), new { id = user.Id }, user.ToDto());
         }
     }
 }
