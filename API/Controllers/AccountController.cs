@@ -17,7 +17,7 @@ namespace API.Controllers
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
             // Implementation for user registration
-            if (await context.AppUsers.AnyAsync(u => u.Email == registerDto.Email))
+            if (await context.Users.AnyAsync(u => u.Email == registerDto.Email))
             {
                 return BadRequest("Email already exists");
             }
@@ -31,7 +31,7 @@ namespace API.Controllers
                 PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
                 PasswordSalt = hmac.Key// Note: In a real application, you should hash the password before storing it
             };
-            context.AppUsers.Add(user);
+            context.Users.Add(user);
             await context.SaveChangesAsync();
             return user.ToDto(tokenService);
         }
@@ -39,7 +39,7 @@ namespace API.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
         {
-             var user = await context.AppUsers.SingleOrDefaultAsync(x => x.Email == loginDto.Email);
+             var user = await context.Users.SingleOrDefaultAsync(x => x.Email == loginDto.Email);
 
             if (user == null) return Unauthorized("Invalid email address");
 

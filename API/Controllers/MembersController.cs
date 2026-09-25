@@ -2,6 +2,7 @@ using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Extension;
+using API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,34 +10,43 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Controllers
 {
     // locahost:5001/api/members    
-    // [Authorize]
-    public class MembersController(AppDbContext context) : BaseController
+    [Authorize]
+    public class MembersController(
+        IMemberRepository memberRepository
+    ) : BaseController
     {
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<UserDto>>> GetMembers()
+        public async Task<ActionResult<IReadOnlyList<Member>>> GetMembers()
         {
-            var members = await context.AppUsers.Select(x=>AppUserExtensions.ToDto(x)).ToListAsync();
+            var members = await memberRepository.GetMembersAsync();
             
-            return members;
+            return Ok(members);
         }
 
         [HttpGet("{id}")] // locahost:5001/api/members/bob-id
-        public async Task<ActionResult<UserDto>> GetMember(string id)
+        public async Task<ActionResult<Member>> GetMember(Guid id)
         {
-            var member = await context.AppUsers.FindAsync(id);
+            var member = await memberRepository.GetMemberByIdAsync(id);
 
             if (member == null) return NotFound();
 
-            return member.ToDto();
+            return member;
         }
+
+        [HttpGet("{id}/photos")]
+        public async Task<ActionResult<IReadOnlyList<Photo>>> GetMemberPhotos(Guid id)
+        {
+            var photos = await memberRepository.GetPhotosForMemberAsync(id);
+            return Ok(photos);
+        }
+
         [HttpPost]
-        public async Task<ActionResult<UserDto>> CreateMember(AppUser user)
+        public async Task<ActionResult<Member>> CreateMember(Member user)
         {
             user.Id = Guid.NewGuid();
-            context.AppUsers.Add(user);
-            await context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetMember), new { id = user.Id }, user.ToDto());
+            var member= await memberRepository.Add(user);
+            await memberRepository.SaveAllAsync();
+            return member;
         }
     }
 }
