@@ -23,6 +23,7 @@
     <Folder Include="DTOs\" />
     <Folder Include="Extension\" />
     <Folder Include="Interfaces\" />
+    <Folder Include="Middleware\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

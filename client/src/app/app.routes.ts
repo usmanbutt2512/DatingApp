@@ -5,9 +5,13 @@ import { MemberDetailed } from '../features/members/member-detailed/member-detai
 import { Messages } from '../features/messages/messages';
 import { Lists } from '../features/lists/lists';
 import { authGuard } from '../core/guards/auth-guard';
+import { TestErrors } from '../features/test-errors/test-errors';
+import { NotFound } from '../shared/errors/not-found/not-found';
+import { from } from 'rxjs';
+import { ServerError } from '../shared/errors/server-error/server-error';
 
-export const routes: Routes = [
-    { path: '', component: Home, title: 'Home' },
+export const routes: Routes = [    
+    { path: '', component: Home, title: 'Home' },    
     {
         path: '',
         runGuardsAndResolvers: 'always',
@@ -18,8 +22,10 @@ export const routes: Routes = [
             { path: 'lists', component: Lists },
             { path: 'messages', component: Messages },
         ]
-    },
-    { path: '**', redirectTo: '' }
+    },    
+    { path: 'server-error', component: ServerError, title: 'Server Error' },
+    { path: 'errors', component: TestErrors, title: 'Test Errors' },
+    { path: '**',  component: NotFound  }
 
 ];
 
